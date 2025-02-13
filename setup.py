@@ -57,16 +57,21 @@ cythonized_extensions = cythonize(
     compiler_directives={'language_level': "3"}
 )
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 with open("LICENSE", "r", encoding="utf-8") as fh:
     license_file = fh.read()
 
 setup(
     name="yticker",
-    version="0.1.0",
+    version="0.1.3",
     author="Tapan Hazarika",
     author_email="tapanhaz@gmail.com",
     description="A Python package for connecting to yahoo websocket.",
     license= license_file,
+    long_description= long_description,
+    long_description_content_type= "text/markdown",
     url="https://github.com/Tapanhaz/yticker",
     classifiers=[
         "Programming Language :: Python :: 3",
