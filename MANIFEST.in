@@ -1,0 +1,3 @@
+graft yticker
+include yticker/*.pyx
+include yticker/*.pxd

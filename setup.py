@@ -65,7 +65,7 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setup(
     name="yticker",
-    version="0.1.3",
+    version="0.1.4",
     author="Tapan Hazarika",
     author_email="tapanhaz@gmail.com",
     description="A Python package for connecting to yahoo websocket.",
@@ -81,5 +81,9 @@ setup(
     ext_modules=cythonized_extensions,  
     install_requires=install_requires, 
     zip_safe=False, 
-    packages=find_packages()
+    packages=find_packages(),
+    package_data={
+        "yticker": ["*.pyi", "py.typed"]
+    },
+    include_package_data=True
 )
