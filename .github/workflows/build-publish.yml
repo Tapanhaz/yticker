@@ -26,14 +26,8 @@ jobs:
           - os: windows-2025-vs2026
             cibw_archs: "AMD64"
 
-          - os: windows-11-vs2026-arm
-            cibw_archs: "ARM64"
-
           - os: macos-15
             cibw_archs: "arm64"
-
-          - os: macos-15-intel
-            cibw_archs: "x86_64"
     steps:
       - uses: actions/checkout@v4
 
