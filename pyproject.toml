@@ -1,61 +1,42 @@
+[build-system]
+requires = ["setuptools>=77", "Cython>=3.0", "picows>=2.3.1,<2.4"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "yticker"
-description = "A Python package for connecting to yahoo websocket."
-authors = [{name = "Tapan Hazarika", email = "tapanhaz@gmail.com"}]
-requires-python = '>=3.8'
-readme = "README.md"
-license = {text = "MIT License"}
 dynamic = ["version"]
-keywords = ["yahoo", "websocket"]
-dependencies = ["picows", "pyrobuf", "orjson"]
+description = "Fast Cython websocket client for Yahoo Finance streaming quotes."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Tapan Hazarika", email = "tapanhaz@gmail.com" }]
+keywords = ["yahoo", "finance", "websocket", "cython", "asyncio"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Framework :: AsyncIO",
-    "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
     "Operating System :: POSIX",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Cython",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Cython",
-    "Programming Language :: Python :: Implementation :: CPython"
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
 ]
 
-[build-system]
-requires = ["setuptools", "wheel", "Cython", "pyrobuf", "orjson", "picows"]
-build-backend = "setuptools.build_meta"
+dependencies = [
+    "picows>=2.3.1,<2.4",
+    "orjson",
+    "uvloop>=0.19.0; sys_platform != 'win32'",
+    "winloop>=0.1.0; sys_platform == 'win32'",
+]
 
-[tool.cibuildwheel]
-build = "*"
-skip = "cp36-* cp37-* pp*"
-test-skip = ""
-free-threaded-support = false
-
-archs = ["auto"]
-build-frontend = "default"
-dependency-versions = "pinned"
-build-verbosity = 0
-
-before-all = ""
-before-build = ""
-repair-wheel-command = ""
-
-container-engine = "docker"
-
-[tool.cibuildwheel.linux]
-repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
-
-[tool.cibuildwheel.macos]
-repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
-
-[tool.cibuildwheel.windows]
-
-[tool.cibuildwheel.pyodide]
 
 [project.urls]
 Homepage = "https://github.com/Tapanhaz/yticker"
@@ -64,6 +45,17 @@ Issues = "https://github.com/Tapanhaz/yticker/issues"
 
 [tool.setuptools]
 packages = ["yticker"]
+include-package-data = false
+zip-safe = false
 
 [tool.setuptools.dynamic]
-version = {attr = "yticker.__version__"}
+version = { attr = "yticker.__version__" }
+
+[tool.setuptools.package-data]
+yticker = ["*.pyi", "py.typed"]
+
+[tool.cibuildwheel]
+build = "cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+skip = "*-win32 *-manylinux_i686 *-musllinux_* pp*"
+build-verbosity = 1
+test-command = "python -c \"import yticker; from yticker import YTicker; print('yticker', yticker.__version__)\""
