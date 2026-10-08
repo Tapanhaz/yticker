@@ -7,7 +7,7 @@ name = "yticker"
 dynamic = ["version"]
 description = "Fast Cython websocket client for Yahoo Finance streaming quotes."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Tapan Hazarika", email = "tapanhaz@gmail.com" }]
@@ -21,7 +21,6 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Cython",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -55,7 +54,7 @@ version = { attr = "yticker.__version__" }
 yticker = ["*.pyi", "py.typed"]
 
 [tool.cibuildwheel]
-build = "cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
-skip = "*-win32 *-manylinux_i686 *-musllinux_* pp*"
+build = "cp310-* cp311-* cp312-* cp313-* cp314-*"
+skip = "cp39-* *-win32 *-manylinux_i686 *-musllinux_* pp*"
 build-verbosity = 1
 test-command = "python -c \"import yticker; from yticker import YTicker; print('yticker', yticker.__version__)\""
