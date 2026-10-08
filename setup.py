@@ -1,89 +1,30 @@
-import os
-import sys
-import platform
-import subprocess
 from Cython.Build import cythonize
-from setuptools import setup, Extension, find_packages
-try:
-    from pyrobuf import __path__ as pyrobuf_path
-except ModuleNotFoundError:
-    print("pyrobuf not found. Installing...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pyrobuf"])
-finally:
-    from pyrobuf import __path__ as pyrobuf_path
+from setuptools import Extension, setup
+from setuptools.command.build_ext import build_ext
 
-pyrobuf_src_path = os.path.join(pyrobuf_path[0], 'src')
 
-compiler_flags = []
-linker_flags = []
-install_requires = ["Cython", "picows", "pyrobuf", "orjson"]
+class BuildExt(build_ext):
+    _FLAGS = {  # noqa: RUF012
+        "msvc": ["/std:c++latest", "/O2"],
+        "unix": ["-std=c++23", "-O3"],
+        "mingw32": ["-std=c++23", "-O3"],
+    }
 
-if platform.system() == "Windows":
-    if "msvc" in sys.version.lower():
-        compiler_flags = ['/std:c++17', "/O2"]
-        linker_flags = ["/O2"]       
-    elif "gcc" in sys.version.lower() or "clang" in sys.version.lower():
-        compiler_flags = ["-O3", '-flto']
-        linker_flags = ["-O3"]
-    event_loop = "winloop"
-else:
-    compiler_flags = ["-O3", '-flto']
-    linker_flags = ["-O3"]
-    event_loop = "uvloop"
+    def build_extensions(self):
+        flags = self._FLAGS.get(self.compiler.compiler_type, [])
+        for ext in self.extensions:
+            ext.extra_compile_args = flags + list(ext.extra_compile_args or [])
+        super().build_extensions()
 
-install_requires.append(event_loop)
 
 extensions = [
-    Extension(
-        name="yticker.yaticker_proto",
-        sources=["yticker/yaticker_proto.pyx"],
-        language="c++",
-        include_dirs=[pyrobuf_src_path], 
-        extra_compile_args=compiler_flags,
-        extra_link_args=linker_flags
-    ),
-    Extension(
-        name="yticker.yticker",
-        sources=["yticker/yticker.pyx"],
-        language="c++",
-        extra_compile_args=compiler_flags,
-        extra_link_args=linker_flags
-    ),
+    Extension("yticker.yticker", ["yticker/yticker.pyx"], language="c++"),
 ]
 
-cythonized_extensions = cythonize(
-    extensions,
-    include_path=[pyrobuf_src_path],  
-    compiler_directives={'language_level': "3"}
-)
-
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
-
-with open("LICENSE", "r", encoding="utf-8") as fh:
-    license_file = fh.read()
-
 setup(
-    name="yticker",
-    version="0.1.4",
-    author="Tapan Hazarika",
-    author_email="tapanhaz@gmail.com",
-    description="A Python package for connecting to yahoo websocket.",
-    license= license_file,
-    long_description= long_description,
-    long_description_content_type= "text/markdown",
-    url="https://github.com/Tapanhaz/yticker",
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    ext_modules=cythonized_extensions,  
-    install_requires=install_requires, 
-    zip_safe=False, 
-    packages=find_packages(),
-    package_data={
-        "yticker": ["*.pyi", "py.typed"]
-    },
-    include_package_data=True
+    ext_modules=cythonize(
+        extensions,
+        compiler_directives={"language_level": "3"},
+    ),
+    cmdclass={"build_ext": BuildExt},
 )
